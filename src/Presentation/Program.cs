@@ -1,18 +1,38 @@
-var builder = WebApplication.CreateBuilder(args);
+using Infraestructure.Identity.Seeds;
+using Infraestructure.Persistence;
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+public class Program
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+
+    public static async Task Main(string[] args)
+    {
+
+        var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
+
+        builder.Services.AddPersistenceServices(builder.Configuration);
+        builder.Services.AddIdentityService(builder.Configuration);
+        var app = builder.Build();
+
+        // Configure the HTTP request pipeline.
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
+
+        using(var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            await RoleSeeder.SeedRolesAndUserAsync(services); 
+        }
+
+        app.UseHttpsRedirection();
+
+
+        app.Run();
+
+    }
 }
-
-app.UseHttpsRedirection();
-
-
-app.Run();
