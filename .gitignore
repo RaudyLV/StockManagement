@@ -1,4 +1,6 @@
 *bin
 *obj
 *sln
-.fake
+*fake
+*txt
+*http
