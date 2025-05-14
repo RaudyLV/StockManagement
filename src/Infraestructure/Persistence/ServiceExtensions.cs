@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using Infraestructure.Persistence.Context;
 using Infraestructure.Persistence.Repositories;
+using Infraestructure.Persistence.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,7 @@ namespace Infraestructure.Persistence
 
             
             services.AddScoped(typeof(IRepositoryAsync<>), typeof(RepositoryAsync<>));
-            
+            services.AddTransient<ICategoryService, CategoryService>();
         }
     }
 }

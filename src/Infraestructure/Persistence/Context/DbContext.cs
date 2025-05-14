@@ -16,6 +16,8 @@ namespace Infraestructure.Persistence.Context
 
         public DbSet<DomainUser> Users { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Brand> Brands { get; set; }
         public DbSet<InventoryMovements> inventoryMovements{ get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -22,6 +22,69 @@ namespace Infraestructure.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("CategoryProduct", b =>
+                {
+                    b.Property<Guid>("CategoriesId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("CategoriesId", "ProductsId");
+
+                    b.HasIndex("ProductsId");
+
+                    b.ToTable("ProductsCategories", (string)null);
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Brand", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Available")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Brands");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Category", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Available")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.DomainUser", b =>
                 {
                     b.Property<string>("Id")
@@ -76,10 +139,8 @@ namespace Infraestructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("nvarchar(40)");
+                    b.Property<Guid>("BrandId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -99,7 +160,24 @@ namespace Infraestructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BrandId");
+
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("CategoryProduct", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Category", null)
+                        .WithMany()
+                        .HasForeignKey("CategoriesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.InventoryMovements", b =>
@@ -111,6 +189,22 @@ namespace Infraestructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Product", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Brand", "Brand")
+                        .WithMany("Products")
+                        .HasForeignKey("BrandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Brand");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Brand", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }
