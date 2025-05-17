@@ -9,6 +9,7 @@ namespace Application.Interfaces
         Task<Category> GetByIdAsync(Guid id);
         Task AddAsync(Category category);
         Task UpdateAsync(Category category);
-        Task DeleteAsync(Guid Id);
+        Task DeleteAsync(Category category);
+        Task<Category> GetCategoryByNameAsync(string name);
     }
 }
