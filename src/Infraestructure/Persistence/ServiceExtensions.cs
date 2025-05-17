@@ -19,6 +19,7 @@ namespace Infraestructure.Persistence
             
             services.AddScoped(typeof(IRepositoryAsync<>), typeof(RepositoryAsync<>));
             services.AddTransient<ICategoryService, CategoryService>();
+            services.AddTransient<IBrandService, BrandService>();
         }
     }
 }
