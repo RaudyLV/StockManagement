@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
+using Application.Exceptions;
 using Application.Interfaces;
 using Ardalis.Specification;
 using Core.Domain.Entities;
@@ -46,7 +44,56 @@ namespace StockManagement.UnitTests.Services
             result.Should().NotBeNull();
             result.Id.Should().Be(id);
             result.Products.Should().HaveCount(2);
-            
+
+        }
+
+        [Fact]
+        public async Task UpdateBrand_ShouldUpdate_WhenNoConflict()
+        {
+            // Arrange
+            var brandToUpdate = new Brand
+            {
+                Id = Guid.NewGuid(),
+                Name = "Nike" 
+            };
+
+            _mockRepo.Setup(repo => repo.FirstOrDefaultAsync(It.IsAny<ISpecification<Brand>>(), default))
+                     .ReturnsAsync((Brand?)null);
+
+            //Act
+            await _service.UpdateAsync(brandToUpdate);
+
+            //Arrange
+            _mockRepo.Verify(repo => repo.UpdateAsync(brandToUpdate, default), Times.Once());   
+            _mockRepo.Verify(repo => repo.SaveChangesAsync(default), Times.Once());   
+        }
+
+        [Fact]
+        public async Task UpdateBrand_ShouldThrowException_WhenBrandDoesExist()
+        {
+            // Arrange
+            var brandToUpdate = new Brand
+            {
+                Id = Guid.NewGuid(),
+                Name = "Nike" // mismo nombre que la otra marca
+            };
+
+            var existingBRand = new Brand
+            {
+                Id = Guid.NewGuid(),
+                Name = "Nike"
+            };
+
+            _mockRepo.Setup(r => r.FirstOrDefaultAsync(
+                It.IsAny<ISpecification<Brand>>(),
+                It.IsAny<CancellationToken>()
+            )).ReturnsAsync(existingBRand);
+
+            //Act
+            var result = async () => await _service.UpdateAsync(brandToUpdate);
+
+            //Assert
+            await result.Should().ThrowAsync<AlreadyExistException>();
         }
     }
 }
