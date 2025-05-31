@@ -23,14 +23,13 @@ namespace Infraestructure.Persistence.Configurations
                         .IsRequired();
                 builder.Property(p => p.Quantity)
                         .IsRequired();
+
+                builder.Property(p => p.IsAvailable)
+                        .IsRequired();
                 
                 builder.HasOne(b => b.Brand)
                         .WithMany(p => p.Products)
                         .HasForeignKey(b => b.BrandId);
-                
-                builder.HasMany(c => c.Categories)
-                        .WithMany(p => p.Products);
-
         
         }
     }

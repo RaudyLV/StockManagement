@@ -31,7 +31,7 @@ namespace StockManagement.UnitTests.Services
                 new Product { Id = Guid.NewGuid(), Name = "Air Jordan 5", Description = "Tenis jordan", Quantity = 6, UnitPrice = 15.00, BrandId = id }
             };
 
-            var expectedBrand = new Brand { Id = id, Name = "Nike", Description = "Tenis deportivos", Available = true, Products = products };
+            var expectedBrand = new Brand { Id = id, Name = "Nike", Description = "Tenis deportivos", IsAvailable = true, Products = products };
 
             _mockRepo.Setup(repo => repo.FirstOrDefaultAsync(It.IsAny<ISpecification<Brand>>(), default))
             .ReturnsAsync(expectedBrand);

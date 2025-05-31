@@ -12,14 +12,15 @@ namespace Infraestructure.Persistence
     {
         public static void AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<AppDbContext>(options => 
+            services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DomainConnection"),
                 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
-            
+
             services.AddScoped(typeof(IRepositoryAsync<>), typeof(RepositoryAsync<>));
-            services.AddTransient<ICategoryService, CategoryService>();
             services.AddTransient<IBrandService, BrandService>();
+            services.AddTransient<IProductService, ProductService>();
+            services.AddTransient<IInventoryMovementService, InventoryMovementService>();
         }
     }
 }

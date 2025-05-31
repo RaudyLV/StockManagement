@@ -60,7 +60,7 @@ namespace Presentation.Middlewares
                     new 
                     {
                         error = ex.Message,
-                        ex.StackTrace
+                        ex.InnerException?.Message
                     }
                 );
             }

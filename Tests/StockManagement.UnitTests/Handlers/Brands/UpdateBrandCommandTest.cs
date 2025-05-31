@@ -29,7 +29,7 @@ namespace StockManagement.UnitTests.Handlers.Brands
             _handler = new UpdateBrandCommandHandler(_mockService.Object, _mapper);
         }
 
-        public void UpdateCommandHandler_Should_ExecuteSuccesfully()
+        public async Task UpdateCommandHandler_Should_ExecuteSuccesfully()
         {
             //Arrange
             var existingBrand = new Brand
@@ -37,7 +37,7 @@ namespace StockManagement.UnitTests.Handlers.Brands
                 Id = Guid.NewGuid(),
                 Name = "Nombre viejo",
                 Description = "Vieja descripcion",
-                Available = true
+                IsAvailable = true
             };
 
             var command = new UpdateBrandCommand
@@ -52,12 +52,12 @@ namespace StockManagement.UnitTests.Handlers.Brands
             _mockService.Setup(s => s.GetBrandById(command.Id))
                         .ReturnsAsync(existingBrand);
             //Act
-            var handle = new UpdateBrandCommandHandler(_mockService.Object, _mapper);
+            var handle = await _handler.Handle(command, default);
 
             //Arrange
             existingBrand.Name.Should().Be("Nombre nuevo");
             existingBrand.Description.Should().Be("Nueva descripcion");
-            existingBrand.Available.Should().Be(false);
+            existingBrand.IsAvailable.Should().Be(false);
 
             _mockService.Verify(s => s.UpdateAsync(existingBrand), Times.Once());  
         }

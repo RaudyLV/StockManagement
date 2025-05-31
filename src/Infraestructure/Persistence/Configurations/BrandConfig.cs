@@ -17,7 +17,7 @@ namespace Infraestructure.Persistence.Configurations
                     .HasMaxLength(256)
                     .IsRequired();
             
-            builder.Property(x => x.Available)
+            builder.Property(x => x.IsAvailable)
                     .IsRequired();
             
             builder.HasMany(p => p.Products)

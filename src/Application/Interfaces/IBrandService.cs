@@ -1,5 +1,6 @@
 
 
+using Application.DTOs;
 using Core.Domain.Entities;
 
 namespace Application.Interfaces
@@ -12,6 +13,6 @@ namespace Application.Interfaces
         Task UpdateAsync(Brand brand);
         Task DeleteAsync(Brand brand);
         Task AddProductToListAsync(Guid BrandId, Product product);
-        Task<Brand> GetBrandByNameAsync(string name);
+        Task<BrandDto> GetBrandByNameAsync(string name);
     }
 }

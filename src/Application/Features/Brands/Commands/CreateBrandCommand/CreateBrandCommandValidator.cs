@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 using FluentValidation;
 
 namespace Application.Features.Brands.Commands.CreateBrandCommand
@@ -18,8 +15,7 @@ namespace Application.Features.Brands.Commands.CreateBrandCommand
                 .NotEmpty().WithMessage("La descripción no puede estar vacio.")
                 .MaximumLength(256).WithMessage("La descripción no puedde ser mayor a 256 cáracteres.");
 
-            RuleFor(x => x.Available)
-                .NotEmpty().WithMessage("Indique si se encuentra o no disponible.");
+            
         }
     }
 }

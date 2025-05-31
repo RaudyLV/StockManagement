@@ -1,4 +1,5 @@
 
+using Application.DTOs;
 using Application.Exceptions;
 using Application.Interfaces;
 using Application.Specifications.Brands;
@@ -17,9 +18,9 @@ namespace Infraestructure.Persistence.Services
 
         public async Task AddAsync(Brand brand)
         {
-            var existsBrand = await _repo.FirstOrDefaultAsync(new GetBrandByNameSpec(brand.Name));
-            if(existsBrand != null)
-                throw new AlreadyExistException($"La marca {brand.Name} ya existe!");
+            var existsBrand = await GetBrandByNameAsync(brand.Name);
+            
+            if (existsBrand != null) throw new AlreadyExistException($"La marca {brand.Name} ya existe!");
             
             await _repo.AddAsync(brand);
             await _repo.SaveChangesAsync();
@@ -48,7 +49,7 @@ namespace Infraestructure.Persistence.Services
         }
         public async Task<Brand> GetBrandById(Guid id)
         {
-            var brand = await _repo.FirstOrDefaultAsync(new BrandByIdWithProductsSpec(id));
+            var brand = await _repo.GetByIdAsync(id);
             if (brand == null)
                 throw new NotFoundException("La marca no existe!");
 
@@ -74,9 +75,7 @@ namespace Infraestructure.Persistence.Services
             await _repo.UpdateAsync(brand);
             await _repo.SaveChangesAsync();
         }
-
-        //Esta funcion ayuda a verificar si existe una marca con el mismo nombre ya
-        public async Task<Brand> GetBrandByNameAsync(string name)
+        public async Task<BrandDto> GetBrandByNameAsync(string name)
         {
             var existingBrand = await _repo.FirstOrDefaultAsync(new GetBrandByNameSpec(name));
 
