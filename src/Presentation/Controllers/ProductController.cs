@@ -3,6 +3,7 @@ using Application.Features.Products.Commands.CreateProductCommand;
 using Application.Features.Products.Commands.DeleteProductCommand;
 using Application.Features.Products.Commands.UpdateProductCommand;
 using Application.Features.Products.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers
@@ -12,25 +13,31 @@ namespace Presentation.Controllers
     public class ProductController : BaseApiController
     {
         [HttpGet("{name}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetByNameAsync(string name)
         {
             return Ok(await Mediator!.Send(new GetProductByNameQuery { Name = name }));
         }
 
         [HttpPost]
-        // [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] CreateProductCommand request)
         {
             return Ok(await Mediator!.Send(request));
         }
 
         [HttpDelete("{id}")]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete([FromQuery] Guid id)
         {
             return Ok(await Mediator!.Send(new DeleteProductCommand { Id = id }));
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update( Guid id, [FromBody] UpdateProductCommand request)
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateProductCommand request)
         {
             return Ok(await Mediator!.Send(new UpdateProductCommand
             {

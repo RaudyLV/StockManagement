@@ -21,6 +21,7 @@ namespace Infraestructure.Persistence
             services.AddTransient<IBrandService, BrandService>();
             services.AddTransient<IProductService, ProductService>();
             services.AddTransient<IInventoryMovementService, InventoryMovementService>();
+            services.AddTransient<IUserService, UserService>();
         }
     }
 }
