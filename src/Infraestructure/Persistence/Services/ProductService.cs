@@ -1,5 +1,6 @@
 using Application.DTOs;
 using Application.Exceptions;
+using Application.Features.Products.Queries;
 using Application.Interfaces;
 using Application.Specifications.Products;
 using Core.Domain.Entities;
@@ -85,9 +86,17 @@ namespace Infraestructure.Persistence.Services
             return product;
         }
 
-        public Task<ICollection<Product>> GetProductsAsync()
+        public async Task<ICollection<Product>> GetProductsAsync(GetAllProductsQuery request)
         {
-            throw new NotImplementedException();
+            return await _repository.ListAsync(new PagedProductsSpec
+            (
+                request.PageSize,
+                request.PageNumber,
+                request.Name,
+                request.BrandName,
+                request.Price,
+                request.Quantity
+            ));
         }
         public async Task<ProductDto> GetProductByNameAsync(string name)
         {

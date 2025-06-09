@@ -1,6 +1,8 @@
 
 
+using Application.Features.InventoryMovements;
 using Application.Interfaces;
+using Application.Specifications.Movements;
 using Core.Domain.Entities;
 
 namespace Infraestructure.Persistence.Services
@@ -46,9 +48,15 @@ namespace Infraestructure.Persistence.Services
             await _repo.SaveChangesAsync();
         }
 
-        public Task<ICollection<InventoryMovements>> GetAllMovementsAsync()
+        public async Task<ICollection<InventoryMovements>> GetAllMovementsAsync(GetAllMovementsQuery query)
         {
-            throw new NotImplementedException();
+            return await _repo.ListAsync(new PagedMovementsSpec
+            (
+                query.PageSize,
+                query.PageNumber,
+                query.Reason,
+                query.ProductName
+            ));
         }
 
         public Task<InventoryMovements> GetMovementsByIdAsync(Guid Id)

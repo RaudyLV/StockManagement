@@ -1,12 +1,13 @@
 
 using Application.DTOs;
+using Application.Features.Products.Queries;
 using Core.Domain.Entities;
 
 namespace Application.Interfaces
 {
     public interface IProductService
     {
-        Task<ICollection<Product>> GetProductsAsync();
+        Task<ICollection<Product>> GetProductsAsync(GetAllProductsQuery request);
         Task<Product> GetProductByIdAsync(Guid id);
         Task AddAsync(Product product);
         Task DeleteAsync(Product product);

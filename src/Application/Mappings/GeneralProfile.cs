@@ -17,7 +17,7 @@ namespace Application.Mappings
         {
             #region  Dtos
             CreateMap<Product, ProductDto>();
-    
+            CreateMap<InventoryMovements, InventoryMovementsDto>();
             CreateMap<Brand, BrandDto>();
             #endregion
 

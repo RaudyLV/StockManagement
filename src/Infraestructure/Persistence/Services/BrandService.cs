@@ -1,8 +1,10 @@
 
 using Application.DTOs;
 using Application.Exceptions;
+using Application.Features.Brands.Queries;
 using Application.Interfaces;
 using Application.Specifications.Brands;
+using Azure;
 using Core.Domain.Entities;
 
 namespace Infraestructure.Persistence.Services
@@ -56,11 +58,8 @@ namespace Infraestructure.Persistence.Services
             return brand;
                                     
         }
-
-        public IQueryable<Brand> GetBrands()
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<ICollection<Brand>> GetBrandsAsync(GetAllBrandsQuery query)
+                => await _repo.ListAsync(new PagedBrandsSpec(query.PageSize, query.PageNumber, query.brandName));
 
         //Funcion para agregar una lista de producto a la marca correspondiente
         //Servira para filtrados y demas. 
