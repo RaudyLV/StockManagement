@@ -3,6 +3,7 @@ using Infraestructure.Identity.Seeds;
 using Infraestructure.Persistence;
 using Microsoft.OpenApi.Models;
 using Presentation.Extensions;
+using Presentation.Middlewares;
 
 public class Program
 {
@@ -14,7 +15,6 @@ public class Program
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddControllers();
-        builder.Services.AddAntiforgery();
         builder.Services.AddSwaggerGen(c =>
         {
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -41,8 +41,8 @@ public class Program
             });
         });
 
-        builder.Services.AddPersistenceServices(builder.Configuration);
         builder.Services.AddIdentityService(builder.Configuration);
+        builder.Services.AddPersistenceServices(builder.Configuration);
         builder.Services.AddApplicationLayer();
 
 
@@ -61,11 +61,13 @@ public class Program
         }
 
         app.UseHttpsRedirection();
-        app.ErrorHandlerMiddleware();
 
+        
         app.UseAuthentication();
+
         app.UseAuthorization();
 
+        app.UseMiddleware<ErrorHandlingMiddleware>();
 
         app.MapControllers();
 

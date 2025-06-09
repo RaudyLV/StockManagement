@@ -3,6 +3,7 @@ using Application.Features.Products.Commands.CreateProductCommand;
 using Application.Features.Products.Commands.DeleteProductCommand;
 using Application.Features.Products.Commands.UpdateProductCommand;
 using Application.Features.Products.Queries;
+using Application.Parameters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +13,22 @@ namespace Presentation.Controllers
     [Route("api/[controller]")]
     public class ProductController : BaseApiController
     {
+
+        [HttpGet()]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllProducts([FromQuery] GetAllProductsParameters filter)
+        {
+            return Ok(await Mediator!.Send(new GetAllProductsQuery
+            {
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize,
+                Name = filter.Name,
+                BrandName = filter.BrandName,
+                Price = filter.Price,
+                Quantity = filter.Quantity
+            }));
+        }
+
         [HttpGet("{name}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetByNameAsync(string name)

@@ -6,10 +6,8 @@ using Application.Exceptions;
 using Application.Interfaces;
 using Application.Wrappers;
 using Core.Domain.Entities;
-using Core.Domain.Settings;
 using Infraestructure.Identity.Helpers;
 using Infraestructure.Identity.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 
 namespace Infraestructure.Identity.Services

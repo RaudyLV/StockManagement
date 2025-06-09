@@ -36,10 +36,14 @@ public static class ServiceExtensions
                                     ?? throw new ArgumentNullException("La 'Key' no fue encontrada en JWTSettings:Key");
 
         services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));
-        services.AddAuthentication(op =>
+        services.AddAuthentication(options =>
         {
-            op.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            op.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultAuthenticateScheme = 
+            options.DefaultChallengeScheme =
+            options.DefaultForbidScheme =
+            options.DefaultScheme = 
+            options.DefaultSignInScheme =
+            options.DefaultSignOutScheme =JwtBearerDefaults.AuthenticationScheme;
         }).AddJwtBearer(op =>
         {
             op.RequireHttpsMetadata = false;
@@ -47,40 +51,46 @@ public static class ServiceExtensions
             op.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
+                ValidateAudience = true,
+                ValidateIssuer = true,
+                ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero,
                 ValidIssuer = configuration["JWTSettings:Issuer"],
                 ValidAudience = configuration["JWTSettings:Audience"],
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
-                RoleClaimType = ClaimTypes.Role
+                RoleClaimType = ClaimTypes.Role,
             };
 
             op.Events = new JwtBearerEvents()
             {
-                OnAuthenticationFailed = async ct =>
-                {
-                    ct.Response.StatusCode = 500;
-                    ct.Response.ContentType = "application/json";
-                    var result = JsonConvert.SerializeObject(new Response<string>(ct.Exception.Message));
-                    await ct.Response.WriteAsync(result);
-                },
 
-                OnChallenge = async ct =>
-                {
-                    ct.HandleResponse();
-                    ct.Response.StatusCode = 401;
-                    ct.Response.ContentType = "application/json";
-                    var result = JsonConvert.SerializeObject(new Response<string>("No estás autenticado."));
-                    await ct.Response.WriteAsync(result);
-                },
+             OnAuthenticationFailed = async context =>
+            {            
+                context.NoResult();
+                context.Response.StatusCode = 500;
+                context.Response.ContentType = "application/json";
+                var result = JsonConvert.SerializeObject(new Response<string>("Error de autenticación"));
+                await context.Response.WriteAsync(result);
 
-                OnForbidden = async ct =>
-                {
-                    
-                    ct.Response.StatusCode = 403;
-                    ct.Response.ContentType = "application/json";
-                    var result = JsonConvert.SerializeObject(new Response<string>("No tienes permisos para esta seccion."));
-                    await ct.Response.WriteAsync(result);
-                },                
+            },
+
+            OnChallenge = async context =>
+            {
+                context.HandleResponse();
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                context.Response.ContentType = "application/json";
+                var result = JsonConvert.SerializeObject(new Response<string>("No estás autenticado."));
+                await context.Response.WriteAsync(result);
+            },
+
+            OnForbidden = async context =>
+            {
+                context.Response.StatusCode = 403;
+                context.Response.ContentType = "application/json";
+                var result = JsonConvert.SerializeObject(new Response<string>("No tienes permisos para esta sección."));
+                Console.WriteLine(context.Response.StatusCode.ToString());
+                await context.Response.WriteAsync(result);
+            }
             };
         });
     }

@@ -49,7 +49,7 @@ namespace Infraestructure.Identity.Helpers
 
             var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jWTSettings.Key));
 
-            var signInCredentials = new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha512);
+            var signInCredentials = new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256);
 
             var JwtSecurityToken = new JwtSecurityToken
             (
@@ -78,7 +78,7 @@ namespace Infraestructure.Identity.Helpers
         //Genera un string de 64 bits para el token
         private string RandomTokenString()
         {
-            var randomBytes = new byte[64];
+            var randomBytes = new byte[32];
 
             using (var rng = RandomNumberGenerator.Create())
             {

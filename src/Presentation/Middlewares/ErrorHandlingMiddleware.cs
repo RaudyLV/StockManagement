@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-
-using System.Linq;
 using System.Net;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Application.Exceptions;
 using FluentValidation;
 
@@ -23,46 +18,51 @@ namespace Presentation.Middlewares
 
         public async Task Invoke(HttpContext context)
         {
-            try 
+            try
             {
                 await _next(context);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
+                _logger.LogError($"[ErrorMiddleware] Response HasStarted: {context.Response.HasStarted}");
                 await HandleExceptionAsync(context, ex);
             }
         }
 
         private async static Task HandleExceptionAsync(HttpContext context, Exception ex)
         {
+            if (context.Response.HasStarted)
+            {
+                return;
+            }
+
             var code = HttpStatusCode.InternalServerError;
             var result = string.Empty;
 
-            switch(ex)
+            switch (ex)
             {
                 case ValidationException validationException:
-                code = HttpStatusCode.BadRequest;
-                var errors = validationException.Errors.Select(e => new {e.PropertyName, e.ErrorMessage});
-                result = JsonSerializer.Serialize(errors);
-                break;
+                    code = HttpStatusCode.BadRequest;
+                    var errors = validationException.Errors.Select(e => new { e.PropertyName, e.ErrorMessage });
+                    result = JsonSerializer.Serialize(errors);
+                    break;
 
                 case NotFoundException _:
-                code = HttpStatusCode.NotFound;
-                break;
+                    code = HttpStatusCode.NotFound;
+                    break;
             }
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)code;
 
-            if(result == string.Empty)
+            if (string.IsNullOrEmpty(result))
             {
-                result = JsonSerializer.Serialize(
-                    new 
-                    {
-                        error = ex.Message,
-                        ex.InnerException?.Message
-                    }
-                );
+                result = JsonSerializer.Serialize(new
+                {
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
             }
 
             await context.Response.WriteAsync(result);
