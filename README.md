@@ -1,7 +1,7 @@
 
 # 📦 StockManagementApi
 
-API robusta de gestión de stock y marcas, desarrollada en **ASP.NET Core** con arquitectura **Clean + Onion**, diseñada para proyectos escalables y mantenibles. Incluye patrones modernos, caché distribuido, mensajería, seguridad y pruebas.
+API robusta de gestión de stock y marcas, desarrollada en **ASP.NET Core** con arquitectura **Clean + Onion**, diseñada para proyectos escalables y mantenibles. Incluye patrones modernos, caché distribuido, seguridad y pruebas.
 
 ---
 
