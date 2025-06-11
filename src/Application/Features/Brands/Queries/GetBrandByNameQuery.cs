@@ -3,7 +3,6 @@ using Application.DTOs;
 using Application.Exceptions;
 using Application.Interfaces;
 using Application.Wrappers;
-using AutoMapper;
 using MediatR;
 
 namespace Application.Features.Brands.Queries
@@ -15,13 +14,11 @@ namespace Application.Features.Brands.Queries
 
     public class GetBrandByNameQueryHandler : IRequestHandler<GetBrandByNameQuery, Response<BrandDto>>
     {
-        private readonly IMapper _mapper;
         private readonly IBrandService _brandService;
 
-        public GetBrandByNameQueryHandler(IMapper mapper, IBrandService brandService)
+        public GetBrandByNameQueryHandler(IBrandService brandService)
         {
 
-            _mapper = mapper;
             _brandService = brandService;
         }
 
@@ -32,9 +29,7 @@ namespace Application.Features.Brands.Queries
             if (existingBrand == null)
                 throw new NotFoundException("La marca no fue encontrada!");
 
-            var brand = _mapper.Map<BrandDto>(existingBrand);
-
-            return new Response<BrandDto>(brand);
+            return new Response<BrandDto>(existingBrand);
         }       
     }
 }

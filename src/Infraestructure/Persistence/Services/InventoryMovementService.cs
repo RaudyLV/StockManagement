@@ -1,5 +1,6 @@
 
 
+using Application.DTOs;
 using Application.Features.InventoryMovements;
 using Application.Interfaces;
 using Application.Specifications.Movements;
@@ -10,10 +11,11 @@ namespace Infraestructure.Persistence.Services
     public class InventoryMovementService : IInventoryMovementService
     {
         private readonly IRepositoryAsync<InventoryMovements> _repo; 
-
-        public InventoryMovementService(IRepositoryAsync<InventoryMovements> repo)
+        private readonly ICacheService _cacheService;
+        public InventoryMovementService(IRepositoryAsync<InventoryMovements> repo, ICacheService cacheService)
         {
             _repo = repo;
+            _cacheService = cacheService;
         }
 
 
@@ -48,15 +50,24 @@ namespace Infraestructure.Persistence.Services
             await _repo.SaveChangesAsync();
         }
 
-        public async Task<ICollection<InventoryMovements>> GetAllMovementsAsync(GetAllMovementsQuery query)
+        public async Task<List<InventoryMovementsDto>> GetAllMovementsAsync(GetAllMovementsQuery query)
         {
-            return await _repo.ListAsync(new PagedMovementsSpec
+            string cacheKey = $"movements:list{query.PageNumber}:{query.ProductName.ToLower() ?? "all"}";
+
+            var cached = await _cacheService.GetAsync<List<InventoryMovementsDto>>(cacheKey);
+            if (cached is not null) return cached;
+
+            var movements = await _repo.ListAsync(new PagedMovementsSpec
             (
                 query.PageSize,
                 query.PageNumber,
                 query.Reason,
                 query.ProductName
             ));
+
+            await _cacheService.SetAsync(cacheKey, movements, TimeSpan.FromHours(1));
+
+            return movements;
         }
 
         public Task<InventoryMovements> GetMovementsByIdAsync(Guid Id)

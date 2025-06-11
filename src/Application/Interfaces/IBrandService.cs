@@ -8,7 +8,7 @@ namespace Application.Interfaces
 {
     public interface IBrandService
     {
-        Task<ICollection<Brand>> GetBrandsAsync(GetAllBrandsQuery query);
+        Task<List<BrandDto>> GetBrandsAsync(GetAllBrandsQuery query);
         Task<Brand> GetBrandById(Guid id);
         Task AddAsync(Brand brand);
         Task UpdateAsync(Brand brand);

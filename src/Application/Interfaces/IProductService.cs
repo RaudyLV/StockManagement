@@ -7,10 +7,9 @@ namespace Application.Interfaces
 {
     public interface IProductService
     {
-        Task<ICollection<Product>> GetProductsAsync(GetAllProductsQuery request);
+        Task<List<ProductDto>> GetProductsAsync(GetAllProductsQuery request);
         Task<Product> GetProductByIdAsync(Guid id);
         Task AddAsync(Product product);
-        Task DeleteAsync(Product product);
         Task UpdateAsync(Product product);
         Task<ProductDto> GetProductByNameAsync(string name);    
     }

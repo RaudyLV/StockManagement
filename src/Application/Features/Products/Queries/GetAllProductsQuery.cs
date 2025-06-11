@@ -21,20 +21,16 @@ namespace Application.Features.Products.Queries
     public class GetAllProductsQueryHandler : IRequestHandler<GetAllProductsQuery, PagedResponse<List<ProductDto>>>
     {
         private readonly IProductService _service;
-        private readonly IMapper _mapper;
-        public GetAllProductsQueryHandler(IProductService service, IMapper mapper)
+        public GetAllProductsQueryHandler(IProductService service)
         {
             _service = service;
-            _mapper = mapper;
         }
 
         public async Task<PagedResponse<List<ProductDto>>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
         {
             var products = await _service.GetProductsAsync(request);
 
-            var productsDto = _mapper.Map<List<ProductDto>>(products);
-
-            return new PagedResponse<List<ProductDto>>(productsDto, request.PageNumber, request.PageSize);
+            return new PagedResponse<List<ProductDto>>(products, request.PageNumber, request.PageSize);
         }
     }
 }

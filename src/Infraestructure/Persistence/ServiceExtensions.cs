@@ -5,6 +5,7 @@ using Infraestructure.Persistence.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace Infraestructure.Persistence
 {
@@ -17,7 +18,12 @@ namespace Infraestructure.Persistence
                 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
 
+            services.AddSingleton<IConnectionMultiplexer>(sp =>
+                    ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")!));
+
+
             services.AddScoped(typeof(IRepositoryAsync<>), typeof(RepositoryAsync<>));
+            services.AddScoped<ICacheService, CacheService>();
             services.AddTransient<IBrandService, BrandService>();
             services.AddTransient<IProductService, ProductService>();
             services.AddTransient<IInventoryMovementService, InventoryMovementService>();

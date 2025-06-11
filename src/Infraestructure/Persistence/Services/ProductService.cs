@@ -11,14 +11,15 @@ namespace Infraestructure.Persistence.Services
     {
         private readonly IRepositoryAsync<Product> _repository;
         private readonly IInventoryMovementService _inventoryService;
-        
         private readonly IBrandService _brandService;
+        private readonly ICacheService _cacheService;
 
-        public ProductService(IRepositoryAsync<Product> repository, IInventoryMovementService inventoryService, IBrandService brandService)
+        public ProductService(IRepositoryAsync<Product> repository, IInventoryMovementService inventoryService, IBrandService brandService, ICacheService cacheService)
         {
             _repository = repository;
             _inventoryService = inventoryService;
             _brandService = brandService;
+            _cacheService = cacheService;
         }
 
         public async Task AddAsync(Product product)
@@ -45,12 +46,6 @@ namespace Infraestructure.Persistence.Services
                 await _repository.RollbackAsync();
                 throw;
             }
-        }
-
-
-        public Task DeleteAsync(Product product)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task UpdateAsync(Product product)
@@ -86,9 +81,14 @@ namespace Infraestructure.Persistence.Services
             return product;
         }
 
-        public async Task<ICollection<Product>> GetProductsAsync(GetAllProductsQuery request)
+        public async Task<List<ProductDto>> GetProductsAsync(GetAllProductsQuery request)
         {
-            return await _repository.ListAsync(new PagedProductsSpec
+            string cacheKey = $"products:list{request.PageNumber}:{request.Name.ToLower() ?? "all"} ";
+
+            var cached = await _cacheService.GetAsync<List<ProductDto>>(cacheKey);
+            if (cached is not null) return cached;
+
+            var products = await _repository.ListAsync(new PagedProductsSpec
             (
                 request.PageSize,
                 request.PageNumber,
@@ -97,10 +97,21 @@ namespace Infraestructure.Persistence.Services
                 request.Price,
                 request.Quantity
             ));
+
+            await _cacheService.SetAsync(cacheKey, products, TimeSpan.FromMinutes(30));
+            
+            return products;
         }
         public async Task<ProductDto> GetProductByNameAsync(string name)
         {
+            string cacheKey = $"product:byname:{name.ToLower()}";
+
+            var cached = await _cacheService.GetAsync<ProductDto>(cacheKey);
+            if(cached is not null) return cached;
+
             var product = await _repository.FirstOrDefaultAsync(new GetProductByNameSpec(name));
+
+            await _cacheService.SetAsync(cacheKey, product, TimeSpan.FromHours(1));
 
             return product!;
         }
